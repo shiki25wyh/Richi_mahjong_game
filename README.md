@@ -1,0 +1,1 @@
+# Richi_mahjong_game
