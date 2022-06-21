@@ -6,7 +6,7 @@ from mahjong.hand_calculating.hand_config import HandConfig, OptionalRules
 from mahjong.meld import Meld
 import random
 import numpy as np
-import re
+# import re
 
 class Game:
     def __init__(self):
@@ -15,26 +15,26 @@ class Game:
             tiles[i] = i
         np.random.shuffle(tiles)
         # print(tiles)
-        self.east_tiles = tiles[0:13].tolist()
-        self.south_tiles = tiles[13:26].tolist()
-        self.west_tiles = tiles[26:39].tolist()
-        self.north_tiles = tiles[39:52].tolist()
-        self.out_dora_indicators = tiles[52:57].tolist()
-        self.in_dora_indicators = tiles[57:62].tolist()
-        self.supplemental_tiles = tiles[62:66].tolist()
-        self.tiles_pool = tiles[66:].tolist()
-        self.pool_east = []
-        self.pool_south = []
-        self.pool_west = []
-        self.pool_north = []
-        self.east_append_list = [-1]
-        self.south_append_list = [-1]
-        self.west_append_list = [-1]
-        self.north_append_list =[-1]
-        self.east_meld = []
-        self.south_meld = []
-        self.west_meld = []
-        self.north_meld = []
+        self.east_tiles = tiles[0:13].tolist() #0
+        self.south_tiles = tiles[13:26].tolist() #1
+        self.west_tiles = tiles[26:39].tolist() #2
+        self.north_tiles = tiles[39:52].tolist() #3
+        self.out_dora_indicators = tiles[52:57].tolist() #4
+        self.in_dora_indicators = tiles[57:62].tolist() #5
+        self.supplemental_tiles = tiles[62:66].tolist() #6
+        self.tiles_pool = tiles[66:].tolist() #7
+        self.pool_east = [] #8
+        self.pool_south = [] #9
+        self.pool_west = [] #10
+        self.pool_north = [] #11
+        self.east_append_list = [-1] #12
+        self.south_append_list = [-1] #13
+        self.west_append_list = [-1] #14
+        self.north_append_list =[-1] #15
+        self.east_meld = [] #16
+        self.south_meld = [] #17
+        self.west_meld = [] #18
+        self.north_meld = [] #19
         
     def get_info(self):
         east_tiles = self.east_tiles
@@ -57,6 +57,10 @@ class Game:
         south_meld = self.south_meld
         west_meld = self.west_meld
         north_meld = self.north_meld
+        east_tiles.sort()
+        south_tiles.sort()
+        west_tiles .sort()
+        north_tiles.sort()
         return (east_tiles,
                 south_tiles,
                 west_tiles,
@@ -99,326 +103,373 @@ class Game:
         south_meld = info[17]
         west_meld = info[18]
         north_meld = info[19]
-
         
-        match player_wind:
-            case 0:
-                if is_pong != -1:
-                    south_append_list = [-1]
-                    x = int(input('东choose which tile'))
-                    east_append_list[0] = east_tiles[x]
-                    pool_east.append(east_tiles[x])
-                    east_tiles.pop(x)
-                    player_wind = 1
-                    is_pong = -1
-
-                    pong_result = pong(0,info[12],info[1],info[2],info[3])
-                
-                    if pong_result == 1:
-                        is_pong = east_append_list[0]
+        
+        if len(tiles_pool)==0:
+            print('流局')
+            return 'g','g','g'
+        
+    
+        if len(tiles_pool)!=0:
+            match player_wind:
+                case 0:
+                    if is_pong != -1:
+                        south_append_list = [-1]
+                        # print info
+                        # print(east_tiles)
+                        x = input('东choose which tile')
+                        while x not in ['0','1','2','3','4','5','6','7','8','9','10','11','12','13']:
+                            x = input('please input correct NO.')
+                        x = int(x)
+                        east_append_list[0] = east_tiles[x]
+                        pool_east.append(east_tiles[x])
+                        east_tiles.pop(x)
                         player_wind = 1
-                        south_tiles.append(east_append_list.pop())
+                        is_pong = -1
 
-                    if pong_result == 2:
-                        is_pong = east_append_list[0]
-                        player_wind = 2
-                        west_tiles.append(east_append_list.pop())
+                        pong_result = pong(0,east_append_list,south_append_list,west_append_list,north_append_list,east_tiles,south_tiles,west_tiles,north_tiles)
 
-                    if pong_result == 3:
-                        is_pong = east_append_list[0]
-                        player_wind = 3
-                        north_tiles.append(east_append_list.pop())
+                        if pong_result == 1:
+                            is_pong = east_append_list[0]
+                            player_wind = 1
+                            south_tiles.append(east_append_list.pop())
+                            pong_tiles_meld(is_pong,south_tiles,south_meld)
+
+                        if pong_result == 2:
+                            is_pong = east_append_list[0]
+                            player_wind = 2
+                            west_tiles.append(east_append_list.pop())
+                            pong_tiles_meld(is_pong,west_tiles,west_meld)
+
+                        if pong_result == 3:
+                            is_pong = east_append_list[0]
+                            player_wind = 3
+                            north_tiles.append(east_append_list.pop())
+                            pong_tiles_meld(is_pong,north_tiles,north_meld)
 
 
-                    if pong_result == 4:
-                        pass
-                    return player_wind,is_pong,(east_tiles,south_tiles,west_tiles,north_tiles,out_dora_indicators,in_dora_indicators,supplemental_tiles,tiles_pool,pool_east,pool_south,pool_west,pool_north,east_append_list,south_append_list,west_append_list,north_append_list,east_meld,south_meld,west_meld,north_meld)
+                        if pong_result == 4:
+                            pass
+                        return player_wind,is_pong,(east_tiles,south_tiles,west_tiles,north_tiles,out_dora_indicators,in_dora_indicators,supplemental_tiles,tiles_pool,pool_east,pool_south,pool_west,pool_north,east_append_list,south_append_list,west_append_list,north_append_list,east_meld,south_meld,west_meld,north_meld)
 
-                                                
-                
-                if is_pong == -1:
-                    south_append_list = [-1]   
+                                                    
                     
-                    east_tiles.append(tiles_pool.pop())
-                    x = int(input('东choose which tile'))
-                    east_append_list[0] = east_tiles[x]
-                    pool_east.append(east_tiles[x])
-                    east_tiles.pop(x)
-                    player_wind = 1
-                    is_pong = -1
-
-                    pong_result = pong(0,info[12],info[1],info[2],info[3])
-                
-                    if pong_result == 1:
-                        is_pong = east_append_list[0]
+                    if is_pong == -1:
+                        south_append_list = [-1]   
+                        east_tiles.append(tiles_pool.pop())
+                        #print info
+                        # print(east_tiles)
+                        x = input('东choose which tile')
+                        while x not in ['0','1','2','3','4','5','6','7','8','9','10','11','12','13']:
+                            x = input('please input correct NO.')
+                        x = int(x)
+                        east_append_list[0] = east_tiles[x]
+                        pool_east.append(east_tiles[x])
+                        east_tiles.pop(x)
                         player_wind = 1
-                        south_tiles.append(east_append_list.pop())
+                        is_pong = -1
 
-                    if pong_result == 2:
-                        is_pong = east_append_list[0]
-                        player_wind = 2
-                        west_tiles.append(east_append_list.pop())
-
-                    if pong_result == 3:
-                        is_pong = east_append_list[0]
-                        player_wind = 3
-                        north_tiles.append(east_append_list.pop())
-
-
-                    if pong_result == 4:
-                        pass
-                        
-                    return player_wind,is_pong,(east_tiles,south_tiles,west_tiles,north_tiles,out_dora_indicators,in_dora_indicators,supplemental_tiles,tiles_pool,pool_east,pool_south,pool_west,pool_north,east_append_list,south_append_list,west_append_list,north_append_list,east_meld,south_meld,west_meld,north_meld)
-                        
-            case 1:
-
-                if is_pong != -1:
-                    west_append_list = [-1]
-                    x = int(input('南choose which tile'))
-                    south_append_list[0] = south_tiles[x]
-                    pool_south.append(south_tiles[x])
-                    south_tiles.pop(x)
-                    player_wind = 2
-                    is_pong = -1
-
-
-                   
-                    pong_result = pong(1,info[13],info[2],info[3],info[0])
-
-                    if pong_result == 2:
-                        is_pong = south_append_list[0]
-                        player_wind = 2
-                        west_tiles.append(south_append_list.pop())
-
-                    if pong_result == 3:
-                        is_pong = south_append_list[0]
-                        player_wind = 3
-                        north_tiles.append(south_append_list.pop())
-
-                    if pong_result == 0:
-                        is_pong = south_append_list[0]
-                        player_wind = 0
-                        east_tiles.append(south_append_list.pop())
-
-
-                    if pong_result == 4:
-                        pass
-                    return player_wind,is_pong,(east_tiles,south_tiles,west_tiles,north_tiles,out_dora_indicators,in_dora_indicators,supplemental_tiles,tiles_pool,pool_east,pool_south,pool_west,pool_north,east_append_list,south_append_list,west_append_list,north_append_list,east_meld,south_meld,west_meld,north_meld)
-
-
-        
-                if is_pong == -1:
-                    west_append_list = [-1]
-                    south_tiles.append(tiles_pool.pop())
-                    x = int(input('南choose which tile'))
-                    south_append_list[0] = south_tiles[x]
-                    pool_south.append(south_tiles[x])
-                    south_tiles.pop(x)
-                    player_wind = 2
-                    is_pong = -1
-
-
-                   
-                    pong_result = pong(1,info[13],info[2],info[3],info[0])
-
-                    if pong_result == 2:
-                        is_pong = south_append_list[0]
-                        player_wind = 2
-                        west_tiles.append(south_append_list.pop())
-
-                    if pong_result == 3:
-                        is_pong = south_append_list[0]
-                        player_wind = 3
-                        north_tiles.append(south_append_list.pop())
-
-                    if pong_result == 0:
-                        is_pong = south_append_list[0]
-                        player_wind = 0
-                        east_tiles.append(south_append_list.pop())
-
-
-                    if pong_result == 4:
-                        pass
-                        
-                    return player_wind,is_pong,(east_tiles,south_tiles,west_tiles,north_tiles,out_dora_indicators,in_dora_indicators,supplemental_tiles,tiles_pool,pool_east,pool_south,pool_west,pool_north,east_append_list,south_append_list,west_append_list,north_append_list,east_meld,south_meld,west_meld,north_meld)
-
-
-
-            case 2:
-                if is_pong != -1:
-                    north_append_list = [-1]
-                    x = int(input('西choose which tile'))
-                    west_append_list[0] = west_tiles[x]
-                    pool_west.append(west_tiles[x])
-                    west_tiles.pop(x)
-                    player_wind = 3
-                    is_pong = -1
-
-
-                    pong_result = pong(2,info[14],info[3],info[0],info[1])
-
-                    if pong_result == 3:
-                        is_pong = west_append_list[0]
-                        player_wind = 3
-                        north_tiles.append(west_append_list.pop())
-
-                    if pong_result == 0:
-                        is_pong = west_append_list[0]
-                        player_wind = 0
-                        east_tiles.append(west_append_list.pop())
-
-                    if pong_result == 1:
-                        is_pong = west_append_list[0]
-                        player_wind = 1
-                        south_tiles.append(west_append_list.pop())
-
-
-                    if pong_result == 4:
-                        pass
-                    return player_wind,is_pong,(east_tiles,south_tiles,west_tiles,north_tiles,out_dora_indicators,in_dora_indicators,supplemental_tiles,tiles_pool,pool_east,pool_south,pool_west,pool_north,east_append_list,south_append_list,west_append_list,north_append_list,east_meld,south_meld,west_meld,north_meld)
-   
-
-
-
-
-
-                if is_pong == -1:
-                    north_append_list = [-1]
-                    west_tiles.append(tiles_pool.pop())
-                    x = int(input('西choose which tile'))
-                    west_append_list[0] = west_tiles[x]
-                    pool_west.append(west_tiles[x])
-                    west_tiles.pop(x)
-                    player_wind = 3
-                    is_pong = -1
-
-
-                    pong_result = pong(2,info[14],info[3],info[0],info[1])
-
-                    if pong_result == 3:
-                        is_pong = west_append_list[0]
-                        player_wind = 3
-                        north_tiles.append(west_append_list.pop())
-
-                    if pong_result == 0:
-                        is_pong = west_append_list[0]
-                        player_wind = 0
-                        east_tiles.append(west_append_list.pop())
-
-                    if pong_result == 1:
-                        is_pong = west_append_list[0]
-                        player_wind = 1
-                        south_tiles.append(west_append_list.pop())
-
-
-                    if pong_result == 4:
-                        pass
-                        
-                    return player_wind,is_pong,(east_tiles,south_tiles,west_tiles,north_tiles,out_dora_indicators,in_dora_indicators,supplemental_tiles,tiles_pool,pool_east,pool_south,pool_west,pool_north,east_append_list,south_append_list,west_append_list,north_append_list,east_meld,south_meld,west_meld,north_meld)
-
-
-
-            case 3:
-                if is_pong != -1:
-                    east_append_list = [-1]
-                    x = int(input('北choose which tile'))
-                    north_append_list[0] = north_tiles[x]
-                    pool_north.append(north_tiles[x])
-                    north_tiles.pop(x)
-                    player_wind = 0
-                    is_pong = -1
-
-                    pong_result = pong(3,info[15],info[0],info[1],info[2])
-                   
-                        
-
-                    if pong_result == 0:
-                        is_pong = north_append_list[0]
-                        player_wind = 0
-                        east_tiles.append(north_append_list.pop())
-
-                    if pong_result == 1:
-                        is_pong = north_append_list[0]
-                        player_wind = 1
-                        south_tiles.append(north_append_list.pop())
-
-                    if pong_result == 2:
-                        is_pong = north_append_list[0]
-                        player_wind = 2
-                        west_tiles.append(north_append_list.pop())
-    
-
-                    if pong_result == 4:
-                        pass
-                    return player_wind,is_pong,(east_tiles,south_tiles,west_tiles,north_tiles,out_dora_indicators,in_dora_indicators,supplemental_tiles,tiles_pool,pool_east,pool_south,pool_west,pool_north,east_append_list,south_append_list,west_append_list,north_append_list,east_meld,south_meld,west_meld,north_meld)
-
-
-
-
-
-
-
-                if is_pong == -1:
-                    east_append_list = [-1]
-
-                    print(north_tiles)
-                    x = int(input('北choose which tile'))
+                        pong_result = pong(0,east_append_list,south_append_list,west_append_list,north_append_list,east_tiles,south_tiles,west_tiles,north_tiles)
                     
-                    north_tiles.append(tiles_pool.pop())
-                    north_append_list[0] = north_tiles[x]
-                    pool_north.append(north_tiles[x])
-                    north_tiles.pop(x)
-                    player_wind = 0
-                    is_pong = -1
+                        if pong_result == 1:
+                            is_pong = east_append_list[0]
+                            player_wind = 1
+                            south_tiles.append(east_append_list.pop())
+                            pong_tiles_meld(is_pong,south_tiles,south_meld)
 
-                    pong_result = pong(3,info[15],info[0],info[1],info[2])
-                   
-                        
+                        if pong_result == 2:
+                            is_pong = east_append_list[0]
+                            player_wind = 2
+                            west_tiles.append(east_append_list.pop())
+                            pong_tiles_meld(is_pong,west_tiles,west_meld)
 
-                    if pong_result == 0:
-                        is_pong = north_append_list[0]
-                        player_wind = 0
-                        east_tiles.append(north_append_list.pop())
+                        if pong_result == 3:
+                            is_pong = east_append_list[0]
+                            player_wind = 3
+                            north_tiles.append(east_append_list.pop())
+                            pong_tiles_meld(is_pong,north_tiles,north_meld)
 
-                    if pong_result == 1:
-                        is_pong = north_append_list[0]
-                        player_wind = 1
-                        south_tiles.append(north_append_list.pop())
 
-                    if pong_result == 2:
-                        is_pong = north_append_list[0]
+                        if pong_result == 4:
+                            pass
+                            
+                        return player_wind,is_pong,(east_tiles,south_tiles,west_tiles,north_tiles,out_dora_indicators,in_dora_indicators,supplemental_tiles,tiles_pool,pool_east,pool_south,pool_west,pool_north,east_append_list,south_append_list,west_append_list,north_append_list,east_meld,south_meld,west_meld,north_meld)
+                            
+                case 1:
+
+                    if is_pong != -1:
+                        west_append_list = [-1]
+                        # print info
+                        # print(south_tiles)
+                        x = input('南choose which tile')
+                        while x not in ['0','1','2','3','4','5','6','7','8','9','10','11','12','13']:
+                            x = input('please input correct NO.')
+                        x = int(x)
+                        south_append_list[0] = south_tiles[x]
+                        pool_south.append(south_tiles[x])
+                        south_tiles.pop(x)
                         player_wind = 2
-                        west_tiles.append(north_append_list.pop())
+                        is_pong = -1
+
+
+                    
+                        pong_result = pong(1,east_append_list,south_append_list,west_append_list,north_append_list,east_tiles,south_tiles,west_tiles,north_tiles)
+
+                        if pong_result == 2:
+                            is_pong = south_append_list[0]
+                            player_wind = 2
+                            west_tiles.append(south_append_list.pop())
+                            west_tiles,west_meld = pong_tiles_meld(is_pong,west_tiles,west_meld)
+
+                        if pong_result == 3:
+                            is_pong = south_append_list[0]
+                            player_wind = 3
+                            north_tiles.append(south_append_list.pop())
+                            north_tiles,north_meld = pong_tiles_meld(is_pong,north_tiles,north_meld)
+
+                        if pong_result == 0:
+                            is_pong = south_append_list[0]
+                            player_wind = 0
+                            east_tiles.append(south_append_list.pop())
+                            east_tiles,east_meld = pong_tiles_meld(is_pong,east_tiles,east_meld)
+
+
+                        if pong_result == 4:
+                            pass
+                        return player_wind,is_pong,(east_tiles,south_tiles,west_tiles,north_tiles,out_dora_indicators,in_dora_indicators,supplemental_tiles,tiles_pool,pool_east,pool_south,pool_west,pool_north,east_append_list,south_append_list,west_append_list,north_append_list,east_meld,south_meld,west_meld,north_meld)
+
+
+            
+                    if is_pong == -1:
+                        west_append_list = [-1]
+                        south_tiles.append(tiles_pool.pop())
+                        # print info
+                        # print(south_tiles)
+                        x = input('南choose which tile')
+                        while x not in ['0','1','2','3','4','5','6','7','8','9','10','11','12','13']:
+                            x = input('please input correct NO.')
+                        x = int(x)
+                        south_append_list[0] = south_tiles[x]
+                        pool_south.append(south_tiles[x])
+                        south_tiles.pop(x)
+                        player_wind = 2
+                        is_pong = -1
+
+
+                    
+                        pong_result = pong(1,east_append_list,south_append_list,west_append_list,north_append_list,east_tiles,south_tiles,west_tiles,north_tiles)
+
+                        if pong_result == 2:
+                            is_pong = south_append_list[0]
+                            player_wind = 2
+                            west_tiles.append(south_append_list.pop())
+                            west_tiles,west_meld = pong_tiles_meld(is_pong,west_tiles,west_meld)
+
+                        if pong_result == 3:
+                            is_pong = south_append_list[0]
+                            player_wind = 3
+                            north_tiles.append(south_append_list.pop())
+                            north_tiles,north_meld = pong_tiles_meld(is_pong,north_tiles,north_meld)
+
+                        if pong_result == 0:
+                            is_pong = south_append_list[0]
+                            player_wind = 0
+                            east_tiles.append(south_append_list.pop())
+                            east_tiles,east_meld = pong_tiles_meld(is_pong,east_tiles,east_meld)
+
+
+                        if pong_result == 4:
+                            pass
+                            
+                        return player_wind,is_pong,(east_tiles,south_tiles,west_tiles,north_tiles,out_dora_indicators,in_dora_indicators,supplemental_tiles,tiles_pool,pool_east,pool_south,pool_west,pool_north,east_append_list,south_append_list,west_append_list,north_append_list,east_meld,south_meld,west_meld,north_meld)
+
+
+
+                case 2:
+                    if is_pong != -1:
+                        north_append_list = [-1]
+                        # print info
+                        # print(west_tiles)
+                        x = input('西choose which tile')
+                        while x not in ['0','1','2','3','4','5','6','7','8','9','10','11','12','13']:
+                            x = input('please input correct NO.')
+                        x = int(x)
+                        west_append_list[0] = west_tiles[x]
+                        pool_west.append(west_tiles[x])
+                        west_tiles.pop(x)
+                        player_wind = 3
+                        is_pong = -1
+
+
+                        pong_result = pong(2,east_append_list,south_append_list,west_append_list,north_append_list,east_tiles,south_tiles,west_tiles,north_tiles)
+
+                        if pong_result == 3:
+                            is_pong = west_append_list[0]
+                            player_wind = 3
+                            north_tiles.append(west_append_list.pop())
+                            north_tiles,north_meld = pong_tiles_meld(is_pong,north_tiles,north_meld)
+
+                        if pong_result == 0:
+                            is_pong = west_append_list[0]
+                            player_wind = 0
+                            east_tiles.append(west_append_list.pop())
+                            east_tiles,east_meld = pong_tiles_meld(is_pong,east_tiles,east_meld)
+
+                        if pong_result == 1:
+                            is_pong = west_append_list[0]
+                            player_wind = 1
+                            south_tiles.append(west_append_list.pop())
+                            south_tiles,south_meld = pong_tiles_meld(is_pong,south_tiles,south_meld)
+
+
+                        if pong_result == 4:
+                            pass
+                        return player_wind,is_pong,(east_tiles,south_tiles,west_tiles,north_tiles,out_dora_indicators,in_dora_indicators,supplemental_tiles,tiles_pool,pool_east,pool_south,pool_west,pool_north,east_append_list,south_append_list,west_append_list,north_append_list,east_meld,south_meld,west_meld,north_meld)
     
 
-                    if pong_result == 4:
-                        pass
-                        
-                    return player_wind,is_pong,(east_tiles,south_tiles,west_tiles,north_tiles,out_dora_indicators,in_dora_indicators,supplemental_tiles,tiles_pool,pool_east,pool_south,pool_west,pool_north,east_append_list,south_append_list,west_append_list,north_append_list,east_meld,south_meld,west_meld,north_meld)
+
+
+
+
+                    if is_pong == -1:
+                        north_append_list = [-1]
+                        west_tiles.append(tiles_pool.pop())
+                        # print info
+                        # print(west_tiles)
+                        x = input('西choose which tile')
+                        while x not in ['0','1','2','3','4','5','6','7','8','9','10','11','12','13']:
+                            x = input('please input correct NO.')
+                        x = int(x)
+                        west_append_list[0] = west_tiles[x]
+                        pool_west.append(west_tiles[x])
+                        west_tiles.pop(x)
+                        player_wind = 3
+                        is_pong = -1
+
+
+                        pong_result = pong(2,east_append_list,south_append_list,west_append_list,north_append_list,east_tiles,south_tiles,west_tiles,north_tiles)
+
+                        if pong_result == 3:
+                            is_pong = west_append_list[0]
+                            player_wind = 3
+                            north_tiles.append(west_append_list.pop())
+                            north_tiles,north_meld = pong_tiles_meld(is_pong,north_tiles,north_meld)
+
+                        if pong_result == 0:
+                            is_pong = west_append_list[0]
+                            player_wind = 0
+                            east_tiles.append(west_append_list.pop())
+                            east_tiles,east_meld = pong_tiles_meld(is_pong,east_tiles,east_meld)
+
+                        if pong_result == 1:
+                            is_pong = west_append_list[0]
+                            player_wind = 1
+                            south_tiles.append(west_append_list.pop())
+                            south_tiles,south_meld = pong_tiles_meld(is_pong,south_tiles,south_meld)
+
+
+                        if pong_result == 4:
+                            pass
+                            
+                        return player_wind,is_pong,(east_tiles,south_tiles,west_tiles,north_tiles,out_dora_indicators,in_dora_indicators,supplemental_tiles,tiles_pool,pool_east,pool_south,pool_west,pool_north,east_append_list,south_append_list,west_append_list,north_append_list,east_meld,south_meld,west_meld,north_meld)
+
+
+
+                case 3:
+                    if is_pong != -1:
+                        east_append_list = [-1]
+                        # print info 
+                        # print(north_tiles)
+                        x = input('北choose which tile')
+                        while x not in ['0','1','2','3','4','5','6','7','8','9','10','11','12','13']:
+                            x = input('please input correct NO.')
+                        x = int(x)
+                        north_append_list[0] = north_tiles[x]
+                        pool_north.append(north_tiles[x])
+                        north_tiles.pop(x)
+                        player_wind = 0
+                        is_pong = -1
+
+                        pong_result = pong(3,east_append_list,south_append_list,west_append_list,north_append_list,east_tiles,south_tiles,west_tiles,north_tiles)
+                    
+                            
+
+                        if pong_result == 0:
+                            is_pong = north_append_list[0]
+                            player_wind = 0
+                            east_tiles.append(north_append_list.pop())
+                            east_tiles,east_meld = pong_tiles_meld(is_pong,east_tiles,east_meld)
+
+                        if pong_result == 1:
+                            is_pong = north_append_list[0]
+                            player_wind = 1
+                            south_tiles.append(north_append_list.pop())
+                            south_tiles,south_meld = pong_tiles_meld(is_pong,south_tiles,south_meld)
+
+                        if pong_result == 2:
+                            is_pong = north_append_list[0]
+                            player_wind = 2
+                            west_tiles.append(north_append_list.pop())
+                            west_tiles,west_meld = pong_tiles_meld(is_pong,west_tiles,west_meld)
+        
+
+                        if pong_result == 4:
+                            pass
+                        return player_wind,is_pong,(east_tiles,south_tiles,west_tiles,north_tiles,out_dora_indicators,in_dora_indicators,supplemental_tiles,tiles_pool,pool_east,pool_south,pool_west,pool_north,east_append_list,south_append_list,west_append_list,north_append_list,east_meld,south_meld,west_meld,north_meld)
 
 
 
 
 
-        # if player_wind == 1:
-        #     if pong(player_wind,info[2],info[3],info[0]) == 0 or 1 or 2 or 3:
-        #         player_wind = pong(0,info[1],info[2],info[3])
-        #     if pong(player_wind,info[2],info[3],info[0]) == 4:
-        #         player_wind == 2
-
-        # if player_wind == 2:
-        #     if pong(player_wind,info[3],info[0],info[1]) == 0 or 1 or 2 or 3:
-        #         player_wind = pong(0,info[1],info[2],info[3])
-        #     if pong(player_wind,info[3],info[0],info[1]) == 4:
-        #         player_wind == 3
-
-        # if player_wind == 3:
-        #     if pong(player_wind,info[0],info[1],info[2]) == 0 or 1 or 2 or 3:
-        #         player_wind = pong(0,info[1],info[2],info[3])
-        #     if pong(player_wind,info[0],info[1],info[2]) == 4:
-        #         player_wind == 0
 
 
+                    if is_pong == -1:
+                        east_append_list = [-1]
+                        # print info 
+                        # print(north_tiles)
+                        x = input('北choose which tile')
+                        while x not in ['0','1','2','3','4','5','6','7','8','9','10','11','12','13']:
+                            x = input('please input correct NO.')
+                        x = int(x)
+                        north_tiles.append(tiles_pool.pop())
+                        north_append_list[0] = north_tiles[x]
+                        pool_north.append(north_tiles[x])
+                        north_tiles.pop(x)
+                        player_wind = 0
+                        is_pong = -1
+
+                        pong_result = pong(3,east_append_list,south_append_list,west_append_list,north_append_list,east_tiles,south_tiles,west_tiles,north_tiles)
+                    
+                            
+
+                        if pong_result == 0:
+                            is_pong = north_append_list[0]
+                            player_wind = 0
+                            east_tiles.append(north_append_list.pop())
+                            east_tiles,east_meld = pong_tiles_meld(is_pong,east_tiles,east_meld)
+
+                        if pong_result == 1:
+                            is_pong = north_append_list[0]
+                            player_wind = 1
+                            south_tiles.append(north_append_list.pop())
+                            south_tiles,south_meld = pong_tiles_meld(is_pong,south_tiles,south_meld)
+
+                        if pong_result == 2:
+                            is_pong = north_append_list[0]
+                            player_wind = 2
+                            west_tiles.append(north_append_list.pop())
+                            west_tiles,west_meld = pong_tiles_meld(is_pong,west_tiles,west_meld)
+        
+
+                        if pong_result == 4:
+                            pass
+                            
+                        return player_wind,is_pong,(east_tiles,south_tiles,west_tiles,north_tiles,out_dora_indicators,in_dora_indicators,supplemental_tiles,tiles_pool,pool_east,pool_south,pool_west,pool_north,east_append_list,south_append_list,west_append_list,north_append_list,east_meld,south_meld,west_meld,north_meld)
+
+
+
+
+            
 
 
 
@@ -447,93 +498,93 @@ class Game:
 
     
 
-def pong(wind,append_tile,list_1,list_2,list_3):
+def pong(wind,east_append_list,south_append_list,west_append_list,north_append_list,east_tiles,south_tiles,west_tiles,north_tiles):
     if wind == 0:
-        if can_pong(append_tile,list_1):
+        if can_pong(east_append_list,south_tiles):
             x = input('东pong南y/n')
             if x == 'y':
                 return 1
             if x == 'n':
                 return 4
-        if can_pong(append_tile,list_2):
+        if can_pong(east_append_list,west_tiles):
             x = input('东pong西y/n')
             if x == 'y':
                 return 2
             if x == 'n':
                 return 4
-        if can_pong(append_tile,list_3):
+        if can_pong(east_append_list,north_tiles):
             x = input('东pong北y/n')
             if x == 'y':
                 return 3
             if x == 'n':
                 return 4
-        if (can_pong(append_tile,list_1) and can_pong(append_tile,list_2) and can_pong(append_tile,list_3)) == 0:
+        if (can_pong(east_append_list,south_tiles) and can_pong(east_append_list,west_tiles) and can_pong(east_append_list,north_tiles)) == 0:
             return 4
 
     if wind == 1:
-        if can_pong(append_tile,list_1):
+        if can_pong(south_append_list,west_tiles):
             x = input('南pong西y/n')
             if x == 'y':
                 return 2
             if x == 'n':
                 return 4
-        if can_pong(append_tile,list_2):
+        if can_pong(south_append_list,north_tiles):
             x = input('南pong北y/n')
             if x == 'y':
                 return 3
             if x == 'n':
                 return 4
-        if can_pong(append_tile,list_3):
+        if can_pong(south_append_list,east_tiles):
             x = input('南pong东y/n')
             if x == 'y':
                 return 0
             if x == 'n':
                 return 4
-        if (can_pong(append_tile,list_1) and can_pong(append_tile,list_2) and can_pong(append_tile,list_3)) == 0:
+        if (can_pong(south_append_list,west_tiles) and can_pong(south_append_list,north_tiles) and can_pong(south_append_list,east_tiles)) == 0:
             return 4
 
     if wind == 2:
-        if can_pong(append_tile,list_1):
+        if can_pong(west_append_list,north_tiles):
             x = input('西pong北y/n')
             if x == 'y':
                 return 3
             if x == 'n':
                 return 4
-        if can_pong(append_tile,list_2):
+        if can_pong(west_append_list,east_tiles):
             x = input('西pong东y/n')
             if x == 'y':
                 return 0
             if x == 'n':
                 return 4
-        if can_pong(append_tile,list_3):
+        if can_pong(west_append_list,south_tiles):
             x = input('西pong南y/n')
             if x == 'y':
                 return 1
             if x == 'n':
                 return 4
-        if (can_pong(append_tile,list_1) and can_pong(append_tile,list_2) and can_pong(append_tile,list_3)) == 0:
+        if (can_pong(west_append_list,north_tiles) and can_pong(west_append_list,east_tiles) and can_pong(west_append_list,south_tiles)) == 0:
             return 4
 
     if wind == 3:
-        if can_pong(append_tile,list_1):
+        if can_pong(north_append_list,east_tiles):
             x = input('北pong东y/n')
             if x == 'y':
                 return 0
             if x == 'n':
                 return 4
-        if can_pong(append_tile,list_2):
+        if can_pong(north_append_list,south_tiles):
             x = input('北pong南y/n')
             if x == 'y':
                 return 1
             if x == 'n':
                 return 4
-        if can_pong(append_tile,list_3):
+        if can_pong(north_append_list,west_tiles):
             x = input('北pong西y/n')
             if x == 'y':
                 return 2
             if x == 'n':
                 return 4
-        if (can_pong(append_tile,list_1) and can_pong(append_tile,list_2) and can_pong(append_tile,list_3)) == 0:
+        if (can_pong(north_append_list,east_tiles) and can_pong(north_append_list,south_tiles) and can_pong(north_append_list,west_tiles)) == 0:
             return 4
     
 
@@ -547,6 +598,24 @@ def can_pong(append_tile,list):
         if count<2:
             return False
 
+def pong_tiles_meld(is_pong,tile_list,meld):
+    test_list=[]
+    is_pong_tiles = is_pong//4
+    for i in range(len(tile_list)):
+        # print(list_a[i])
+        k = tile_list[i]//4
+        # print(k)
+        if k == is_pong_tiles:
+            test_list.append(tile_list[i])
+        # print(test_list)
+    tile_list.remove(test_list[0])
+    tile_list.remove(test_list[1])
+    tile_list.remove(test_list[2])
+    meld.append(test_list[0])
+    meld.append(test_list[1])
+    meld.append(test_list[2])
+    
+    return tile_list,meld
     
 
 
@@ -559,18 +628,39 @@ info = game.get_info()
 player_wind = 0
 is_pong = -1
 while True:
+
+    # print(player_wind)
+    if player_wind == 0:
+        # print('pool\n',info[7])
+        print('-----------------------')
+        print('east\n',info[0],info[16])
+    if player_wind == 1:
+        # print('pool\n',info[7])
+        print('-----------------------')
+        print('south\n',info[1],info[17])
+    if player_wind == 2:
+        # print('pool\n',info[7])
+        print('-----------------------')
+        print('west\n',info[2],info[18])
+    if player_wind == 3:
+        # print('pool\n',info[7])
+        print('-----------------------')
+        print('north\n',info[3],info[19])
+    if player_wind == 'g':
+        break
     player_wind,is_pong,info = game.player(player_wind=player_wind,info=info,is_pong=is_pong)
-    print(player_wind)
-    print(is_pong)
-    print('pool\n',info[7])
-    print('east\n',info[0])
-    print(info[8])
-    print('south',info[1])
-    print(info[9])
-    print('west\n',info[2])
-    print(info[10])
-    print('north',info[3])
-    print(info[11])
+    
+    
+    # print(is_pong)
+    # print('pool\n',info[7])
+    # print('east\n',info[0])
+    # print(info[8])
+    # print('south',info[1])
+    # print(info[9])
+    # print('west\n',info[2])
+    # print(info[10])
+    # print('north',info[3])
+    # print(info[11])
     # game.player(player_wind=player_wind,info=info,is_pong=is_pong)
 
 # print('east_tiles',a[2][0])
