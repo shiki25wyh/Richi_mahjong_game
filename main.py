@@ -108,8 +108,8 @@ class Game:
         
         
         if len(tiles_pool)==0:
-            print('流局')
-            return 'g','a','m','e'
+            print('Ryuukyoku')
+            return 'o','v','e','r'
         
     
         if len(tiles_pool)!=0:
