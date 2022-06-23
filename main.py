@@ -243,7 +243,7 @@ class Game:
                         is_chi = state_result[0]
                         player_wind = 3
                         
-                        chi_tiles_meld(is_chi,east_tiles,north_meld,west_append_list)
+                        chi_tiles_meld(is_chi,north_tiles,north_meld,west_append_list)
     
                     return player_wind,is_pong,is_chi,(east_tiles,south_tiles,west_tiles,north_tiles,out_dora_indicators,in_dora_indicators,supplemental_tiles,tiles_pool,pool_east,pool_south,pool_west,pool_north,east_append_list,south_append_list,west_append_list,north_append_list,east_meld,south_meld,west_meld,north_meld)
 
@@ -531,7 +531,7 @@ while True:
         # print('pool\n',info[7])
         print('-----------------------')
         print('north\n',info[3],info[19])
-    if player_wind == 'g':
+    if player_wind == 'o':
         break
     player_wind,is_pong,is_chi,info = game.player(player_wind=player_wind,info=info,is_pong=is_pong)
     
